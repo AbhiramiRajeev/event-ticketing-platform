@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package event;
+
+option go_package = "github.com/AbhiramiRajeev/event-ticketing-platform/proto/event";
+
+service EventService {
+    rpc CreateEvent(CreateEventRequest) returns (Event);
+    rpc GetEvent(GetEventRequest) returns (Event);
+    rpc GetEvents(GetEventsRequest) returns (GetEventsResponse);
+    rpc UpdateEvent(UpdateEventRequest) returns (Event);
+    rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse);
+}
+
+message Event {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    string venue = 4;
+    string date = 5;
+}
+
+message CreateEventRequest {
+    string name = 1;
+    string description = 2;
+    string venue = 3;
+    string date = 4;
+}
+
+message GetEventRequest {
+    string id = 1;
+}
+
+message GetEventsRequest {}
+
+message GetEventsResponse {
+    repeated Event events = 1;
+}
+
+message UpdateEventRequest {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    string venue = 4;
+    string date = 5;
+}
+
+message DeleteEventRequest {
+    string id = 1;
+}
+
+message DeleteEventResponse {
+    bool success = 1;
+}
+
+
+/*
+protoc \
+  --go_out=. \
+  --go_opt=paths=source_relative \
+  --go-grpc_out=. \
+  --go-grpc_opt=paths=source_relative \
+  proto/event/event.proto
+*/

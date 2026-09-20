@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package registration;
+
+option go_package = "github.com/AbhiramiRajeev/event-ticketing-platform/proto/registration";
+
+service RegistrationService {
+    rpc CreateRegistration(CreateRegistrationRequest) returns (Registration);
+    rpc GetRegistration(GetRegistrationRequest) returns (Registration);
+    rpc GetRegistrations(GetRegistrationsRequest) returns (GetRegistrationsResponse);
+    rpc CancelRegistration(CancelRegistrationRequest) returns (CancelRegistrationResponse);
+}
+
+message Registration {
+    string id = 1;
+    string user_id = 2;
+    string event_id = 3;
+    string status = 4;
+}
+
+message CreateRegistrationRequest {
+    string user_id = 1;
+    string event_id = 2;
+}
+
+message GetRegistrationRequest {
+    string id = 1;
+}
+
+message GetRegistrationsRequest {
+    string user_id = 1;
+}
+
+message GetRegistrationsResponse {
+    repeated Registration registrations = 1;
+}
+
+message CancelRegistrationRequest {
+    string id = 1;
+}
+
+message CancelRegistrationResponse {
+    bool success = 1;
+}
