@@ -6,8 +6,8 @@ import (
 	"github.com/AbhiramiRajeev/event-ticketing-platform/internal/gateway"
 	eventpb "github.com/AbhiramiRajeev/event-ticketing-platform/proto/event"
 
-	// registrationpb "github.com/AbhiramiRajeev/event-ticketing-platform/proto/registration"
-	// userpb "github.com/AbhiramiRajeev/event-ticketing-platform/proto/user"
+	registrationpb "github.com/AbhiramiRajeev/event-ticketing-platform/proto/registration"
+	userpb "github.com/AbhiramiRajeev/event-ticketing-platform/proto/user"
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/gin-gonic/gin"
@@ -47,12 +47,14 @@ func main() {
 	defer registrationConn.Close()
 
 	// Create gRPC clients
-	// userClient := userpb.NewUserServiceClient(userConn)
+	userClient := userpb.NewUserServiceClient(userConn)
 	eventClient := eventpb.NewEventServiceClient(eventConn)
-	// registrationClient := registrationpb.NewRegistrationServiceClient(registrationConn)
+	registrationClient := registrationpb.NewRegistrationServiceClient(registrationConn)
 
 	// Create HTTP handlers
 	eventHandler := gateway.NewEventHandler(eventClient)
+	userHandler := gateway.NewUserHandler(userClient)
+	registrationHandler := gateway.NewRegistrationHandler(registrationClient)
 
 	// Gin router
 	r := gin.Default()
@@ -63,6 +65,17 @@ func main() {
 	r.POST("/events", eventHandler.CreateEvent)
 	r.PUT("/events/:id", eventHandler.UpdateEvent)
 	r.DELETE("/events/:id", eventHandler.DeleteEvent)
+
+	//User routes
+	r.POST("/users", userHandler.CreateUser)
+	r.GET("/users/:id", userHandler.GetUser)
+	r.GET("/users", userHandler.GetUsers)
+
+	//registation routes
+	r.POST("/registrations", registrationHandler.CreateRegistration)
+	r.GET("/registrations/:id", registrationHandler.GetRegistration)
+	r.GET("/registrations/user/:userID", registrationHandler.GetRegistrations)
+	r.DELETE("/registrations/:id", registrationHandler.CancelRegistration)
 
 	log.Println("API Gateway running on :8080")
 

@@ -2,7 +2,11 @@ package user
 
 import (
 	"context"
+
 	"github.com/google/uuid"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
 
 	pb "github.com/AbhiramiRajeev/event-ticketing-platform/proto/user"
 )
@@ -43,7 +47,6 @@ func (h *GRPCHandler) CreateUser(
 	}, nil
 }
 
-
 func (h *GRPCHandler) GetUser(
 	ctx context.Context,
 	req *pb.GetUserRequest,
@@ -51,7 +54,11 @@ func (h *GRPCHandler) GetUser(
 
 	user, err := h.service.GetUser(req.Id)
 	if err != nil {
-		return nil, err
+		if err == gorm.ErrRecordNotFound {
+			return nil, status.Error(codes.NotFound, "user not found")
+		}
+
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &pb.User{
@@ -85,5 +92,3 @@ func (h *GRPCHandler) GetUsers(
 
 	return response, nil
 }
-
-

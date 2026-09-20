@@ -31,7 +31,7 @@ func (h *GRPCHandler) CreateRegistration(
 		Status: "registered",
 	}
 
-	err := h.service.CreateRegistration(registration)
+	err := h.service.CreateRegistration(registration,ctx)
 	if err != nil {
 		return nil, err
 	}
