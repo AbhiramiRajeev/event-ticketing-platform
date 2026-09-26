@@ -7,6 +7,7 @@ import (
 	"github.com/AbhiramiRajeev/event-ticketing-platform/config"
 	"github.com/AbhiramiRajeev/event-ticketing-platform/internal/database"
 	"github.com/AbhiramiRajeev/event-ticketing-platform/internal/event"
+	"github.com/AbhiramiRajeev/event-ticketing-platform/internal/seats"
 	pb "github.com/AbhiramiRajeev/event-ticketing-platform/proto/event"
 
 	"google.golang.org/grpc"
@@ -20,13 +21,27 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := db.AutoMigrate(&event.Event{}); err != nil {
-		log.Fatal("failed to migrate event table:", err)
+	// Migrate event and seat tables.
+	if err := db.AutoMigrate(
+		&event.Event{},
+		&seats.Seat{},
+	); err != nil {
+		log.Fatal("failed to migrate event and seat tables:", err)
 	}
 
+	// Event dependencies.
 	eventRepo := event.NewRepository(db)
 	eventService := event.NewService(eventRepo)
-	grpcHandler := event.NewGRPCHandler(eventService)
+
+	// Seat dependencies.
+	seatRepo := seats.NewRepository(db)
+	seatService := seats.NewService(seatRepo)
+
+	// gRPC handler.
+	grpcHandler := event.NewGRPCHandler(
+		eventService,
+		seatService,
+	)
 
 	listener, err := net.Listen("tcp", ":50052")
 	if err != nil {
@@ -42,4 +57,4 @@ func main() {
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatal("failed to serve:", err)
 	}
-}
+}	

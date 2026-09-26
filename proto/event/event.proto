@@ -4,12 +4,19 @@ package event;
 
 option go_package = "github.com/AbhiramiRajeev/event-ticketing-platform/proto/event";
 
+import "google/protobuf/timestamp.proto";
+
 service EventService {
     rpc CreateEvent(CreateEventRequest) returns (Event);
     rpc GetEvent(GetEventRequest) returns (Event);
     rpc GetEvents(GetEventsRequest) returns (GetEventsResponse);
     rpc UpdateEvent(UpdateEventRequest) returns (Event);
     rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse);
+
+    rpc GetSeats(GetSeatsRequest) returns (GetSeatsResponse);
+    rpc GetAvailableSeats(GetAvailableSeatsRequest) returns (GetAvailableSeatsResponse);
+    rpc ReserveSeat(ReserveSeatRequest) returns (Seat);
+    rpc ReleaseSeat(ReleaseSeatRequest) returns (Seat);
 }
 
 message Event {
@@ -17,14 +24,23 @@ message Event {
     string name = 2;
     string description = 3;
     string venue = 4;
-    string date = 5;
+    google.protobuf.Timestamp date = 5;
+    int32 capacity = 6;
+}
+
+message Seat {
+    string id = 1;
+    string event_id = 2;
+    string seat_number = 3;
+    string status = 4;
 }
 
 message CreateEventRequest {
     string name = 1;
     string description = 2;
     string venue = 3;
-    string date = 4;
+    google.protobuf.Timestamp date = 4;
+    int32 capacity = 5;
 }
 
 message GetEventRequest {
@@ -42,7 +58,8 @@ message UpdateEventRequest {
     string name = 2;
     string description = 3;
     string venue = 4;
-    string date = 5;
+    google.protobuf.Timestamp date = 5;
+    int32 capacity = 6;
 }
 
 message DeleteEventRequest {
@@ -51,6 +68,30 @@ message DeleteEventRequest {
 
 message DeleteEventResponse {
     bool success = 1;
+}
+
+message GetSeatsRequest {
+    string event_id = 1;
+}
+
+message GetSeatsResponse {
+    repeated Seat seats = 1;
+}
+
+message GetAvailableSeatsRequest {
+    string event_id = 1;
+}
+
+message GetAvailableSeatsResponse {
+    repeated Seat seats = 1;
+}
+
+message ReserveSeatRequest {
+    string seat_id = 1;
+}
+
+message ReleaseSeatRequest {
+    string seat_id = 1;
 }
 
 

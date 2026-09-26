@@ -17,9 +17,9 @@ func (r *Repository) Create(event *Event) error {
 }
 
 func (r *Repository) GetEvent(id string) (*Event, error) {
-
 	var event Event
-	result := r.db.First(&event, "id=?", id)
+
+	result := r.db.First(&event, "id = ?", id)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -32,6 +32,7 @@ func (r *Repository) GetAll() ([]Event, error) {
 	var events []Event
 
 	result := r.db.Find(&events)
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -45,5 +46,14 @@ func (r *Repository) Update(event *Event) error {
 
 func (r *Repository) Delete(id string) error {
 	result := r.db.Delete(&Event{}, "id = ?", id)
-	return result.Error
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
 }
